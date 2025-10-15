@@ -6,7 +6,12 @@ import (
 )
 
 func ParseHexToBigInt(str string) *big.Int {
-	return (&big.Int{}).SetBytes(MustParseHex(str))
+	i, ok := (&big.Int{}).SetString(str, 16)
+	if !ok {
+		panic(fmt.Sprintf("Failed to parse hex integer: %s", str))
+	}
+
+	return i
 }
 
 func ParseDecimalToBigInt(str string) *big.Int {
