@@ -22,3 +22,10 @@ func ParseDecimalToBigInt(str string) *big.Int {
 
 	return i
 }
+
+func ParseBase64ToBigInt(str string) *big.Int {
+	i := &big.Int{}
+	i.SetBytes(MustParseBase64(str))
+
+	return i
+}

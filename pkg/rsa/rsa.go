@@ -18,6 +18,8 @@ type PublicKey struct {
 
 const KEY_SIZE = 2048
 
+var DefaultE = big.NewInt(3)
+
 func NewKeypair() *Keypair {
 	for {
 		p, err := rand.Prime(rand.Reader, KEY_SIZE/2)
@@ -37,7 +39,7 @@ func NewKeypair() *Keypair {
 			(&big.Int{}).Sub(q, big.NewInt(1)),
 		)
 
-		e := big.NewInt(3)
+		e := (&big.Int{}).Set(DefaultE)
 
 		d := (&big.Int{}).ModInverse(e, et)
 
@@ -85,5 +87,5 @@ func (p *PublicKey) EncryptStringToInt(cleartext string) *big.Int {
 }
 
 func (p *PublicKey) N() *big.Int {
-	return p.n
+	return (&big.Int{}).Set(p.n)
 }
