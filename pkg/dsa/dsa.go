@@ -10,9 +10,10 @@ import (
 )
 
 type Params struct {
-	P *big.Int
-	Q *big.Int
-	G *big.Int
+	P                    *big.Int
+	Q                    *big.Int
+	G                    *big.Int
+	SkipZeroVerification bool
 }
 
 type Keypair struct {
@@ -89,7 +90,7 @@ func (keypair *Keypair) SignWithGivenK(m []byte, k *big.Int) *Signature {
 	r := (&big.Int{}).Exp(g, k, p)
 	r.Mod(r, q)
 
-	if r.Cmp(big.NewInt(0)) == 0 {
+	if !keypair.Params.SkipZeroVerification && r.Cmp(big.NewInt(0)) == 0 {
 		// edge case: r == 0; try again
 		return keypair.Sign(m)
 	}
@@ -105,7 +106,7 @@ func (keypair *Keypair) SignWithGivenK(m []byte, k *big.Int) *Signature {
 	s := (&big.Int{}).Mul(hSum, (&big.Int{}).ModInverse(k, q))
 	s.Mod(s, q)
 
-	if s.Cmp(big.NewInt(0)) == 0 {
+	if !keypair.Params.SkipZeroVerification && s.Cmp(big.NewInt(0)) == 0 {
 		// edge case: s == 0; try again
 		return keypair.Sign(m)
 	}
@@ -122,19 +123,19 @@ func (pubkey *PublicKey) Verify(m []byte, sig *Signature) (bool, error) {
 	g := pubkey.Params.G
 
 	// Verify signature range
-	if sig.R.Cmp(big.NewInt(0)) != 1 {
+	if !pubkey.Params.SkipZeroVerification && sig.R.Cmp(big.NewInt(0)) != 1 {
 		return false, fmt.Errorf("r must be >0")
 	}
 
-	if sig.R.Cmp(q) != -1 {
+	if !pubkey.Params.SkipZeroVerification && sig.R.Cmp(q) != -1 {
 		return false, fmt.Errorf("r must be <q")
 	}
 
-	if sig.S.Cmp(big.NewInt(0)) != 1 {
+	if !pubkey.Params.SkipZeroVerification && sig.S.Cmp(big.NewInt(0)) != 1 {
 		return false, fmt.Errorf("s must be >0")
 	}
 
-	if sig.S.Cmp(q) != -1 {
+	if !pubkey.Params.SkipZeroVerification && sig.S.Cmp(q) != -1 {
 		return false, fmt.Errorf("s must be <q")
 	}
 
