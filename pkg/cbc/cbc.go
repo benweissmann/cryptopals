@@ -2,6 +2,7 @@ package cbc
 
 import (
 	"crypto/cipher"
+	"fmt"
 
 	"github.com/benweissmann/cryptopals/pkg/xor"
 )
@@ -15,6 +16,10 @@ type cbc struct {
 type cbcEncrypter cbc
 
 func NewCBCEncrypter(b cipher.Block, iv []byte) cipher.BlockMode {
+	if len(iv) != b.BlockSize() {
+		panic(fmt.Sprintf("cbc: iv %x does not match block size (len %d; want %d)", iv, len(iv), b.BlockSize()))
+	}
+
 	return &cbcEncrypter{
 		b:         b,
 		blockSize: b.BlockSize(),
