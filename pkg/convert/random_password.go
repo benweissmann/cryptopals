@@ -1,6 +1,7 @@
 package convert
 
 import (
+	cryptoRand "crypto/rand"
 	"fmt"
 	"math/rand/v2"
 	"os"
@@ -35,4 +36,14 @@ func RandomPassword() string {
 	d := Dictionary()
 
 	return fmt.Sprintf("%s%s", d[rand.N(len(d))], d[rand.N(len(d))])
+}
+
+func RandomKey() []byte {
+	key := make([]byte, 16)
+	_, err := cryptoRand.Read(key)
+	if err != nil {
+		panic(err)
+	}
+
+	return key
 }
